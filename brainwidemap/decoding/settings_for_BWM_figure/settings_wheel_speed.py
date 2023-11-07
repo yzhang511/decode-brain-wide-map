@@ -2,8 +2,10 @@ import numpy as np
 from pathlib import Path
 
 from brainwidemap.decoding.functions.process_targets import optimal_Bayesian
-from behavior_models.models.expSmoothing_prevAction import expSmoothing_prevAction
-from behavior_models.models.expSmoothing_stimside import expSmoothing_stimside
+# from behavior_models.models.expSmoothing_prevAction import expSmoothing_prevAction
+# from behavior_models.models.expSmoothing_stimside import expSmoothing_stimside
+from behavior_models.models import ActionKernel
+from behavior_models.models import StimulusKernel
 from sklearn import linear_model as lm
 
 """
@@ -11,9 +13,9 @@ from sklearn import linear_model as lm
 ADAPT AT LEAST THESE IN YOUR COPY OF SETTINGS.PY
 ------------------------------------------------
 """
-RESULTS_DIR = Path("/scratch/users/bensonb/international-brain-lab/paper-brain-wide-map")
+RESULTS_DIR = Path("/mnt/3TB/yizi/decode-paper-brain-wide-map")
 # Directory to which to save all results and outputs, including models. Will be created if it doesn't exist.
-SLURM_DIR = Path("/scratch/users/bensonb/international-brain-lab/paper-brain-wide-map/brainwidemap/logs/slurm")
+SLURM_DIR = Path("/mnt/3TB/yizi/decode-paper-brain-wide-map/brainwidemap/logs/slurm")
 # Directory where slurm output and error files will be saved
 
 DATE = '01-04-2023'
@@ -148,8 +150,8 @@ if BINARIZATION_VALUE and TANH_TRANSFORM:
     raise ValueError("Binarization can be done without tanh_transform; do not choose both")
 
 modeldispatcher = {
-    expSmoothing_prevAction: expSmoothing_prevAction.name,
-    expSmoothing_stimside: expSmoothing_stimside.name,
+    ActionKernel: ActionKernel.name,
+    StimulusKernel: StimulusKernel.name,
     optimal_Bayesian: 'optBay',
     None: 'oracle'
 }
@@ -166,7 +168,7 @@ if ALIGN_TIME not in align_event_options:
     raise NotImplementedError(f"Provided align event '{ALIGN_TIME}' invalid; must be in {align_event_options}")
 
 # ValueErrors and NotImplementedErrors
-if TARGET in ['choice', 'feedback'] and (MODEL != expSmoothing_prevAction or USE_IMPOSTER_SESSION):
+if TARGET in ['choice', 'feedback'] and (MODEL != ActionKernel or USE_IMPOSTER_SESSION):
     raise ValueError('To decode choice or feedback, you must use the actionKernel model and frankenstein sessions')
 
 if ESTIMATOR == lm.LogisticRegression and BALANCED_CONTINUOUS_TARGET:

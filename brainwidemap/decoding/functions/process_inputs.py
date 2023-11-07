@@ -1,5 +1,6 @@
 from brainbox.population.decode import get_spike_counts_in_bins
-from brainbox.processing import bincount2D
+# from brainbox.processing import bincount2D
+from iblutil.numerical import bincount2D
 import numpy as np
 
 

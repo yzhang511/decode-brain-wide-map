@@ -6,10 +6,13 @@ from sklearn import linear_model as sklm
 from sklearn.metrics import accuracy_score, balanced_accuracy_score, r2_score
 from sklearn.model_selection import KFold, train_test_split
 from tqdm import tqdm
-from behavior_models.models.utils import format_data as format_data_mut
-from behavior_models.models.utils import format_input as format_input_mut
+# from behavior_models.models.utils import format_data as format_data_mut
+# from behavior_models.models.utils import format_input as format_input_mut
+from behavior_models.utils import format_data as format_data_mut
+from behavior_models.utils import format_input as format_input_mut
 
-from ibllib.atlas import BrainRegions
+# from ibllib.atlas import BrainRegions
+from ibllib.atlas.regions import BrainRegions
 
 from brainwidemap.decoding.functions.balancedweightings import balanced_weighting
 from brainwidemap.decoding.functions.process_inputs import build_predictor_matrix
@@ -445,7 +448,7 @@ def decode_cv(
     
     # initialize containers to save outputs
     n_trials = len(Xs)
-    bins_per_trial = len(Xs[0])
+    bins_per_trial, units_per_trial = Xs[0].shape
     scores_test, scores_train = [], []
     idxes_test, idxes_train = [], []
     weights, intercepts, best_params = [], [], []
@@ -550,9 +553,13 @@ def decode_cv(
             for ifold, (train_idxs_inner, test_idxs_inner) in enumerate(inner_fold_iter):
 
                 # inner fold data split
-                X_train_inner = np.vstack([X_train[i] for i in train_idxs_inner])
+                if bins_per_trial > 1:
+                    X_train_inner = np.stack([X_train[i] for i in train_idxs_inner]).reshape(-1, bins_per_trial*units_per_trial)
+                    X_test_inner = np.stack([X_train[i] for i in test_idxs_inner]).reshape(-1, bins_per_trial*units_per_trial)
+                else:
+                    X_train_inner = np.vstack([X_train[i] for i in train_idxs_inner])
+                    X_test_inner = np.vstack([X_train[i] for i in test_idxs_inner])
                 y_train_inner = np.concatenate([y_train[i] for i in train_idxs_inner], axis=0)
-                X_test_inner = np.vstack([X_train[i] for i in test_idxs_inner])
                 y_test_inner = np.concatenate([y_train[i] for i in test_idxs_inner], axis=0)
 
                 # normalize inputs/outputs if requested
@@ -588,7 +595,10 @@ def decode_cv(
             r2s_avg = r2s.mean(axis=0)
 
             # normalize inputs/outputs if requested
-            X_train_array = np.vstack(X_train)
+            if bins_per_trial > 1:
+                X_train_array = np.stack(X_train).reshape(-1, bins_per_trial*units_per_trial)
+            else:
+                X_train_array = np.vstack(X_train)
             mean_X_train = X_train_array.mean(axis=0) if normalize_input else 0
             X_train_array = X_train_array - mean_X_train
 
@@ -619,18 +629,24 @@ def decode_cv(
 
             # evaluate model on test data
             y_true = np.concatenate(y_test, axis=0)
-            y_pred = model.predict(np.vstack(X_test) - mean_X_train) + mean_y_train
+            if bins_per_trial > 1:
+                y_pred = model.predict(
+                    np.stack(X_test).reshape(-1, bins_per_trial*units_per_trial) - mean_X_train
+                ) + mean_y_train
+            else:
+                y_pred = model.predict(np.vstack(X_test) - mean_X_train) + mean_y_train
             if isinstance(model, sklm.LogisticRegression) and bins_per_trial == 1:
                 #print("predicting proba in decoding of logistic regression!")
                 y_pred_probs = model.predict_proba(
-                    np.vstack(X_test) - mean_X_train)[:, 1] + mean_y_train
+                    np.vstack(X_test) - mean_X_train
+                )[:, 1] + mean_y_train
                 #print(f"example of proba: {y_pred_probs[0]:.5f}")
                 #print(y_pred_probs[:100], y_pred[:100])
                 #print(np.isclose(y_pred_probs[:100], y_pred[:100]))
                 y_comp_probs = ~(y_pred_probs == 0.5)
                 assert np.all((y_pred_probs[y_comp_probs] > 0.5) == y_pred[y_comp_probs])
             else:
-                print("did not predict proba", estimator, isinstance(model, sklm.LogisticRegression), bins_per_trial)
+                # print("did not predict proba", estimator, isinstance(model, sklm.LogisticRegression), bins_per_trial)
                 y_pred_probs = None
             scores_test.append(scoring_f(y_true, y_pred))
 
@@ -647,11 +663,21 @@ def decode_cv(
                 else:
                     # we already computed these above, but after all trials were stacked;
                     # recompute per-trial
-                    predictions[i_global] = model.predict(
-                        X_test[i_fold] - mean_X_train) + mean_y_train
+                    if bins_per_trial > 1:
+                        predictions[i_global] = model.predict(
+                            X_test[i_fold].reshape(-1, bins_per_trial*units_per_trial) - mean_X_train
+                        ) + mean_y_train
+                    else:
+                        predictions[i_global] = model.predict(
+                            X_test[i_fold] - mean_X_train) + mean_y_train
                     if isinstance(model, sklm.LogisticRegression):
-                        predictions_to_save[i_global] = model.predict_proba(
-                            X_test[i_fold] - mean_X_train)[:, 0] + mean_y_train
+                        if bins_per_trial > 1:
+                            predictions_to_save[i_global] = model.predict_proba(
+                                X_test[i_fold].reshape(-1, bins_per_trial*units_per_trial) - mean_X_train
+                            )[:, 0] + mean_y_train
+                        else:
+                            predictions_to_save[i_global] = model.predict_proba(
+                                X_test[i_fold] - mean_X_train)[:, 0] + mean_y_train
                     else:
                         predictions_to_save[i_global] = predictions[i_global]
 

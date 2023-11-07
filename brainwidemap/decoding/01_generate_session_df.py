@@ -2,14 +2,14 @@ from one.api import ONE
 import pandas as pd
 
 from brainwidemap import bwm_query
-from brainwidemap.decoding.settings import RESULTS_DIR
+from brainwidemap.decoding.settings_for_BWM_figure.settings_choice import RESULTS_DIR
 
 
 # save BiasedChoiceWorld sessions, no template, no neural activity
 # Prepare where to store imposter sessions eid list if using biased choice world
 decoding_dir = RESULTS_DIR.joinpath('decoding')
 decoding_dir.mkdir(exist_ok=True, parents=True)
-one = ONE(base_url='https://alyx.internationalbrainlab.org', mode='remote')
+one = ONE(base_url='https://openalyx.internationalbrainlab.org', mode='remote')
 # eids = one.search(project='ibl_neuropixel_brainwide_01', task_protocol='biasedChoiceWorld')
 qc_pass = (
     '~session__extended_qc___task_stimOn_goCue_delays__lt,0.9,'

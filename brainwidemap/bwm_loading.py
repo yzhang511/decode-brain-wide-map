@@ -148,6 +148,48 @@ def load_good_units(one, pid, compute_metrics=False, qc=1., **kwargs):
     return good_spikes, good_clusters
 
 
+def load_all_units(one, pid, compute_metrics=False, **kwargs):
+    """
+    Function to load the cluster information and spike trains for clusters that pass all quality metrics.
+
+    Parameters
+    ----------
+    one: one.api.ONE
+        Instance to be used to connect to local or remote database
+    pid: str
+        A probe insertion UUID
+    compute_metrics: bool
+        If True, force SpikeSortingLoader.merge_clusters to recompute the cluster metrics. Default is False
+    qc: float
+        Quality threshold to be used to select good clusters. Default is 1.0
+    kwargs:
+        Keyword arguments passed to SpikeSortingLoader upon initiation. Specifically, if one instance offline,
+        you need to pass 'eid' and 'pname' here as they cannot be inferred from pid in offline mode.
+
+    Returns
+    -------
+    good_spikes: dict
+        Spike trains associated with good clusters. Dictionary with keys ['depths', 'times', 'clusters', 'amps']
+    good_clusters: pandas.DataFrame
+        Information of clusters for this pid that pass all quality metrics
+    """
+    eid = kwargs.pop('eid', '')
+    pname = kwargs.pop('pname', '')
+    spike_loader = SpikeSortingLoader(pid=pid, one=one, eid=eid, pname=pname)
+    spikes, clusters, channels = spike_loader.load_spike_sorting()
+    clusters_labeled = SpikeSortingLoader.merge_clusters(
+        spikes, clusters, channels, compute_metrics=compute_metrics).to_df()
+    good_clusters = clusters_labeled
+
+    spike_idx, ib = ismember(spikes['clusters'], good_clusters.index)
+    good_clusters.reset_index(drop=True, inplace=True)
+    # Filter spike trains for only good clusters
+    good_spikes = {k: v[spike_idx] for k, v in spikes.items()}
+    good_spikes['clusters'] = good_clusters.index[ib].astype(np.int32)
+
+    return good_spikes, good_clusters
+
+
 def merge_probes(spikes_list, clusters_list):
     """
     Merge spikes and clusters information from several probes as if they were recorded from the same probe.

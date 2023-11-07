@@ -7,16 +7,17 @@ from one.api import ONE
 import sys
 
 from brainwidemap import bwm_query
-from brainwidemap.decoding.settings import RESULTS_DIR
+# from brainwidemap.decoding.settings import RESULTS_DIR
+from brainwidemap.decoding.settings_for_BWM_figure.settings_choice import RESULTS_DIR
 
 
 # Prepare where to store imposter sessions eid list if using biased choice world
 decoding_dir = RESULTS_DIR.joinpath('decoding')
 
 # Cache data in N_PARA jobs in the 01_slurm*.sh file
-N_PARA = 500
+N_PARA = 1
 # PARAINDEX indicates which of the N_PARA jobs this is. PARAINDEX is in [0,N_PARA-1]
-PARAINDEX = int(sys.argv[1]) - 1
+PARAINDEX = 0
 
 # ephys sessions from from one of 12 templates
 one = ONE(base_url='https://openalyx.internationalbrainlab.org', mode='local')

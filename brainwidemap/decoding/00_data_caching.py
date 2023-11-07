@@ -2,13 +2,15 @@ from brainbox.io.one import SessionLoader
 from one.api import ONE
 import sys
 
+from pathlib import Path
 from brainwidemap import bwm_query, load_good_units
 
 # number of jobs which should be submitted by a .sh file to parallelize data caching
 # data is cached in N_PARA parallel jobs and para_index indicates which parallel job this is
-N_PARA = 50
+N_PARA = 1
 # para_index should be in [0, N_PARA-1]
-para_index = int(sys.argv[1]) - 1
+# para_index = int(sys.argv[1]) - 1
+para_index = 0
 
 """
 -----------
@@ -18,7 +20,7 @@ USER INPUTS
 
 # Whether to download wheel and whisker data as well
 wheel_data = True
-whisker_data = False
+whisker_data = True
 # You can choose the cache directory if you want it to be different from the default
 cache_dir = None  # Path('/full/path/to/cache')
 
