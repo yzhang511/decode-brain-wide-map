@@ -9,8 +9,6 @@ import pandas as pd
 
 from brainwidemap import bwm_query
 from brainwidemap.decoding.functions.process_targets import get_target_variable_in_df
-# from brainwidemap.decoding.settings import params
-# from brainwidemap.decoding.settings import RESULTS_DIR
 from brainwidemap.decoding.settings_for_BWM_figure.settings_choice import params
 from brainwidemap.decoding.settings_for_BWM_figure.settings_choice import RESULTS_DIR
 

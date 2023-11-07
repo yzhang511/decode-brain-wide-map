@@ -20,7 +20,7 @@ USER INPUTS
 
 # Whether to download wheel and whisker data as well
 wheel_data = True
-whisker_data = True
+whisker_data = False
 # You can choose the cache directory if you want it to be different from the default
 cache_dir = None  # Path('/full/path/to/cache')
 

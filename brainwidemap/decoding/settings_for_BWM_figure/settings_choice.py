@@ -69,8 +69,7 @@ elif TARGET == 'signcont':
 elif TARGET == 'choice':
     ALIGN_TIME = 'firstMovement_times'
     TIME_WINDOW = (-0.1, 0.0)
-    # BINSIZE = 0.1
-    BINSIZE = 0.02
+    BINSIZE = 0.1
     N_BINS_LAG = None
     USE_IMPOSTER_SESSION = False
     BINARIZATION_VALUE = 0 # choice vals are -1 and 1
