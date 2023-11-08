@@ -56,7 +56,8 @@ def generate_choices(pseudosess, trials_df, subjModel, modeldispatcher, model_pa
     valid = np.ones([1, pseudosess.index.size], dtype=bool)
     stim, _, side = mut_format_input([pseudosess.signed_contrast.values],
                                      [trials_df.choice.values], [pseudosess.stim_side.values])
-    act_sim, stim, side = model.simulate(arr_params, stim, side, torch.from_numpy(valid), nb_simul=1, only_perf=False)
+    # act_sim, stim, side = model.simulate(arr_params, stim, side, torch.from_numpy(valid), nb_simul=1, only_perf=False)
+    act_sim, stim, side = model.simulate(arr_params, stim[0], side[0], nb_simul=1, only_perf=False)
     act_sim = np.array(act_sim.squeeze().T, dtype=np.int64)
 
     return act_sim

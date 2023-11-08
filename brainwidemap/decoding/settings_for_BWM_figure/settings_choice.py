@@ -67,9 +67,12 @@ elif TARGET == 'signcont':
     TANH_TRANSFORM = True
     EXCLUDE_UNBIASED_TRIALS = False
 elif TARGET == 'choice':
-    ALIGN_TIME = 'firstMovement_times'
-    TIME_WINDOW = (-0.1, 0.0)
-    BINSIZE = 0.1
+    # ALIGN_TIME = 'firstMovement_times'
+    ALIGN_TIME = 'stimOn_times'
+    # TIME_WINDOW = (-0.1, 0.0)
+    TIME_WINDOW = (-0.5, 1.0)
+    # BINSIZE = 0.1
+    BINSIZE = 0.05
     N_BINS_LAG = None
     USE_IMPOSTER_SESSION = False
     BINARIZATION_VALUE = 0 # choice vals are -1 and 1

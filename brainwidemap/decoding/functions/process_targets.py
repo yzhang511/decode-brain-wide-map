@@ -485,7 +485,8 @@ def check_bhv_fit_exists(subject, model, eids, resultpath, modeldispatcher, sing
     '''
     if model not in modeldispatcher.keys():
         raise KeyError('Model is not an instance of a model from behavior_models')
-    path_results_mouse = 'model_%s_' % modeldispatcher[model] + 'single_zeta_' * single_zeta
+    # path_results_mouse = 'model_%s_' % modeldispatcher[model] + 'single_zeta_' * single_zeta
+    path_results_mouse = 'model_%s_' % modeldispatcher[model] + 'single_zeta' * single_zeta
     trunc_eids = [eid.split('-')[0] for eid in eids]
     filen = build_path_mut(path_results_mouse, trunc_eids)
     subjmodpath = Path(resultpath).joinpath(Path(subject))
