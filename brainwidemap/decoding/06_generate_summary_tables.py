@@ -3,7 +3,7 @@ import numpy as np
 import pandas as pd
 from one.api import ONE
 from brainwidemap.bwm_loading import bwm_units
-from brainwidemap.decoding.settings import params, RESULTS_DIR, SETTINGS_FORMAT_NAME, estimatorstr
+from brainwidemap.decoding.settings_for_BWM_figure.settings_choice import params, RESULTS_DIR, SETTINGS_FORMAT_NAME, estimatorstr
 from brainwidemap.decoding.functions.process_outputs import create_pdtable_from_raw
 
 
@@ -51,3 +51,4 @@ if not os.path.exists(str(save_dir)):
 SAVE_SUMMARY_PATH = str(save_dir.joinpath(os.path.basename(SETTINGS_FORMAT_NAME)))
 res_table.to_csv(SAVE_SUMMARY_PATH + '.csv')
 xy_table.to_pickle(SAVE_SUMMARY_PATH + '_xy.pkl')
+print(SAVE_SUMMARY_PATH)
