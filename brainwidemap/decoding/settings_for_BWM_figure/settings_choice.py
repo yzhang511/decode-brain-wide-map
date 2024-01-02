@@ -2,8 +2,6 @@ import numpy as np
 from pathlib import Path
 
 from brainwidemap.decoding.functions.process_targets import optimal_Bayesian
-# from behavior_models.models.expSmoothing_prevAction import expSmoothing_prevAction
-# from behavior_models.models.expSmoothing_stimside import expSmoothing_stimside
 from behavior_models.models import ActionKernel
 from behavior_models.models import StimulusKernel
 from sklearn import linear_model as lm
@@ -38,7 +36,6 @@ TARGET = 'choice'
 ------------------------------------------------
 """
 
-# MODEL = expSmoothing_prevAction
 MODEL = ActionKernel
 # behavioral model used for pLeft
 # - expSmoothing_prevAction (not string)
